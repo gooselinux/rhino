@@ -1,0 +1,32 @@
+This patch attempts to fix a null pointer exception in Rhino when Rhino's 
+attempt to dynamically load the jline library fails.  See Red Hat Bugzilla 
+bug #457336:
+    https://bugzilla.redhat.com/show_bug.cgi?id=457336
+
+This patch is subject to the Rhino License:
+    https://developer.mozilla.org/en/Rhino_License
+
+This patch can be applied with:
+    patch -p 0 < rhino-457336.diff
+Please send comments and questions to:
+    selliott4@austin.rr.com
+
+--- toolsrc/org/mozilla/javascript/tools/shell/ShellLine.java.orig	2009-05-30 18:59:58.000000000 -0500
++++ toolsrc/org/mozilla/javascript/tools/shell/ShellLine.java	2009-05-30 21:17:10.000000000 -0500
+@@ -62,6 +62,16 @@
+         // We don't want a compile-time dependency on the JLine jar, so use
+         // reflection to load and reference the JLine classes.
+         ClassLoader classLoader = ShellLine.class.getClassLoader();
++        if (classLoader == null) {
++            // If the attempt to get a class specific class loader above failed
++            // then fallback to the system class loader.
++            classLoader = ClassLoader.getSystemClassLoader();
++        }
++        if (classLoader == null) {
++            // If for some reason we still don't have a handle to a class
++            // loader then give up (avoid a NullPointerException).
++            return null;
++        }
+         Class<?> readerClass = Kit.classOrNull(classLoader, "jline.ConsoleReader");
+         if (readerClass == null)
+             return null;

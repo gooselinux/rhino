@@ -1,0 +1,192 @@
+diff -ur rhino1_7R2pre.orig/examples/Matrix.java rhino1_7R2pre/examples/Matrix.java
+--- rhino1_7R2pre.orig/examples/Matrix.java	2008-07-28 10:45:22.000000000 -0400
++++ rhino1_7R2pre/examples/Matrix.java	2008-08-11 00:06:20.483267501 -0400
+@@ -249,7 +249,7 @@
+      * Use the convenience method from Context that takes care of calling
+      * toString, etc.
+      */
+-    public Object getDefaultValue(Class<?> typeHint) {
++    public Object getDefaultValue(Class typeHint) {
+         return "[object Matrix]";
+     }
+ 
+diff -ur rhino1_7R2pre.orig/examples/PrimitiveWrapFactory.java rhino1_7R2pre/examples/PrimitiveWrapFactory.java
+--- rhino1_7R2pre.orig/examples/PrimitiveWrapFactory.java	2008-07-28 10:45:22.000000000 -0400
++++ rhino1_7R2pre/examples/PrimitiveWrapFactory.java	2008-08-11 00:07:30.546266985 -0400
+@@ -57,7 +57,7 @@
+ public class PrimitiveWrapFactory extends WrapFactory {
+   @Override
+   public Object wrap(Context cx, Scriptable scope, Object obj,
+-                     Class<?> staticType)
++                     Class staticType)
+   {
+     if (obj instanceof String || obj instanceof Number ||
+         obj instanceof Boolean)
+diff -ur rhino1_7R2pre.orig/src/org/mozilla/javascript/WrapFactory.java rhino1_7R2pre/src/org/mozilla/javascript/WrapFactory.java
+--- rhino1_7R2pre.orig/src/org/mozilla/javascript/WrapFactory.java	2008-07-28 10:45:14.000000000 -0400
++++ rhino1_7R2pre/src/org/mozilla/javascript/WrapFactory.java	2008-08-11 00:07:57.706710143 -0400
+@@ -75,7 +75,7 @@
+      * @return the wrapped value.
+      */
+     public Object wrap(Context cx, Scriptable scope,
+-                       Object obj, Class<?> staticType)
++                       Object obj, Class staticType)
+     {
+         if (obj == null || obj == Undefined.instance
+             || obj instanceof Scriptable)
+diff -ur rhino1_7R2pre.orig/toolsrc/org/mozilla/javascript/tools/shell/JavaPolicySecurity.java rhino1_7R2pre/toolsrc/org/mozilla/javascript/tools/shell/JavaPolicySecurity.java
+--- rhino1_7R2pre.orig/toolsrc/org/mozilla/javascript/tools/shell/JavaPolicySecurity.java	2008-07-28 10:45:18.000000000 -0400
++++ rhino1_7R2pre/toolsrc/org/mozilla/javascript/tools/shell/JavaPolicySecurity.java	2008-08-11 00:06:20.483267501 -0400
+@@ -67,7 +67,7 @@
+             return super.defineClass(name, data, 0, data.length, domain);
+         }
+ 
+-        public void linkClass(Class<?> cl) {
++        public void linkClass(Class cl) {
+             resolveClass(cl);
+         }
+     }
+diff -ur rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/Namespace.java rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/Namespace.java
+--- rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/Namespace.java	2008-07-28 10:45:20.000000000 -0400
++++ rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/Namespace.java	2008-08-11 00:06:20.483267501 -0400
+@@ -115,7 +115,7 @@
+     }
+ 
+     @Override
+-    public Object getDefaultValue(Class<?> hint) {
++    public Object getDefaultValue(Class hint) {
+         return uri();
+     }
+ 
+diff -ur rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/QName.java rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/QName.java
+--- rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/QName.java	2008-07-28 10:45:20.000000000 -0400
++++ rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/QName.java	2008-08-11 00:06:20.484267636 -0400
+@@ -145,7 +145,7 @@
+     }
+ 
+     @Override
+-    public Object getDefaultValue(Class<?> hint) {
++    public Object getDefaultValue(Class hint) {
+         return toString();
+     }
+ 
+diff -ur rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/XMLObjectImpl.java rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/XMLObjectImpl.java
+--- rhino1_7R2pre.orig/xmlimplsrc/org/mozilla/javascript/xmlimpl/XMLObjectImpl.java	2008-07-28 10:45:20.000000000 -0400
++++ rhino1_7R2pre/xmlimplsrc/org/mozilla/javascript/xmlimpl/XMLObjectImpl.java	2008-08-11 00:06:20.498268536 -0400
+@@ -165,7 +165,7 @@
+     }
+ 
+     @Override
+-    public final Object getDefaultValue(Class<?> hint) {
++    public final Object getDefaultValue(Class hint) {
+         return this.toString();
+     }
+ 
+--- rhino1_7R2pre.orig/xmlimplsrc/buildorig	2009-02-13 14:17:57.000000000 -0500
++++ rhino1_7R2pre/xmlimplsrc/build.xml	2009-02-13 14:29:42.000000000 -0500
+@@ -67,6 +67,7 @@
+ 	
+ 	<target name="e4x-compile" if="jdk1.5?">
+ 		<javac
++			bootclasspath="/usr/lib/jvm/java-openjdk/jre/lib/rt.jar"
+ 			srcdir="xmlimplsrc"
+ 			destdir="${classes}"
+ 			deprecation="on"
+--- oldbuild.xml	2009-03-23 12:28:10.000000000 -0400
++++ rhino1_7R2pre/toolsrc/org/mozilla/javascript/tools/debugger/build.xml	2009-03-23 12:28:40.000000000 -0400
+@@ -38,7 +38,7 @@
+ 
+   <target name="properties">
+     <property name="swing-ex-url" value="http://java.sun.com/products/jfc/tsc/articles/treetable2/downloads/src.zip"/>
+-    <available file="downloaded/AbstractCellEditor.java"
++    <available file="treetable/AbstractCellEditor.java"
+                property="swing-ex-available"/>
+   </target>
+ 
+@@ -46,9 +46,9 @@
+     <!-- Download source from Sun's site, unzip it, remove
+          the files we don't need, and change the package
+     -->
+-    <mkdir dir="downloaded"/>
+-    <get src="${swing-ex-url}" dest="downloaded/swingExSrc.zip"/>
+-    <unzip src="downloaded/swingExSrc.zip" dest="downloaded/">
++    <mkdir dir="treetable"/>
++    <get src="${swing-ex-url}" dest="treetable/swingExSrc.zip"/>
++    <unzip src="treetable/swingExSrc.zip" dest="downloaded/">
+       <patternset>
+           <include name="AbstractCellEditor.java"/>
+           <include name="JTreeTable.java"/>
+@@ -56,58 +56,58 @@
+           <include name="TreeTableModelAdapter.java"/>
+       </patternset>
+     </unzip>
+-    <replace file="downloaded/AbstractCellEditor.java">
++    <replace file="treetable/AbstractCellEditor.java">
+        <replacetoken>import java.awt.Component;</replacetoken>
+        <replacevalue>
+-package org.mozilla.javascript.tools.debugger.downloaded;
++package org.mozilla.javascript.tools.debugger.treetable;
+        </replacevalue>
+     </replace>
+-    <replace file="downloaded/AbstractCellEditor.java">
++    <replace file="treetable/AbstractCellEditor.java">
+        <replacetoken>import java.awt.event.*;</replacetoken>
+        <replacevalue></replacevalue>
+     </replace>
+-    <replace file="downloaded/AbstractCellEditor.java">
++    <replace file="treetable/AbstractCellEditor.java">
+        <replacetoken>import java.awt.AWTEvent;</replacetoken>
+        <replacevalue></replacevalue>
+     </replace>
+-    <replace file="downloaded/AbstractCellEditor.java">
++    <replace file="treetable/AbstractCellEditor.java">
+        <replacetoken>import java.io.Serializable;</replacetoken>
+        <replacevalue></replacevalue>
+     </replace>
+-    <replace file="downloaded/JTreeTable.java">
++    <replace file="treetable/JTreeTable.java">
+        <replacetoken>import javax.swing.*;</replacetoken>
+        <replacevalue>
+-         package org.mozilla.javascript.tools.debugger.downloaded;
++         package org.mozilla.javascript.tools.debugger.treetable;
+          import javax.swing.*;
+        </replacevalue>
+     </replace>
+-    <replace file="downloaded/JTreeTable.java">
++    <replace file="treetable/JTreeTable.java">
+        <replacetoken>class ListToTreeSelectionModelWrapper</replacetoken>
+        <replacevalue>public class ListToTreeSelectionModelWrapper</replacevalue>
+     </replace>
+-    <replace file="downloaded/JTreeTable.java">
++    <replace file="treetable/JTreeTable.java">
+        <replacetoken>ListSelectionModel getListSelectionModel</replacetoken>
+        <replacevalue>public ListSelectionModel getListSelectionModel</replacevalue>
+     </replace>
+-    <replace file="downloaded/JTreeTable.java">
++    <replace file="treetable/JTreeTable.java">
+        <replacetoken>import java.awt.Rectangle;</replacetoken>
+        <replacevalue></replacevalue>
+     </replace>
+-    <replace file="downloaded/TreeTableModel.java">
++    <replace file="treetable/TreeTableModel.java">
+        <replacetoken>import javax.swing.tree.TreeModel;</replacetoken>
+        <replacevalue>
+-         package org.mozilla.javascript.tools.debugger.downloaded;
++         package org.mozilla.javascript.tools.debugger.treetable;
+          import javax.swing.tree.TreeModel;
+        </replacevalue>
+     </replace>
+-    <replace file="downloaded/TreeTableModelAdapter.java">
++    <replace file="treetable/TreeTableModelAdapter.java">
+        <replacetoken>import javax.swing.JTree;</replacetoken>
+        <replacevalue>
+-         package org.mozilla.javascript.tools.debugger.downloaded;
++         package org.mozilla.javascript.tools.debugger.treetable;
+          import javax.swing.JTree;
+        </replacevalue>
+     </replace>
+-    <delete file="downloaded/swingExSrc.zip"/>
++    <delete file="treetable/swingExSrc.zip"/>
+   </target>
+ 
+   <target name="download" depends="properties,get-swing-ex"/>
